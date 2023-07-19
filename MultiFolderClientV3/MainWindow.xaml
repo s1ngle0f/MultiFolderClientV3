@@ -7,9 +7,9 @@
         xmlns:local="clr-namespace:MultiFolderClientV3"
         mc:Ignorable="d"
         Height="350" Width="800" WindowStyle="None" ResizeMode="NoResize">
-    <Grid Background="Transparent">
+    <Grid Background="#CCCCFF">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="175"/>
+            <ColumnDefinition Width="175" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -17,22 +17,22 @@
             <RowDefinition Height="50"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="#CCCCCCCC">
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="#6633FF">
             <Image Grid.Row="0" Grid.Column="1" Height="17" Width="17" HorizontalAlignment="Right">
 
             </Image>
         </Grid>
         <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" CornerRadius="0,0,20,20">
             <Grid>
-                <Label Content="MultiFolder" VerticalAlignment="Center" HorizontalAlignment="Left" 
+                <Label Content="MultiFolder" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#CCCCFF"
                Margin="10,0,0,0" FontSize="18"/>
-                <Label Content="UserName" VerticalAlignment="Center" 
+                <Label Content="UserName" VerticalAlignment="Center" Foreground="#CCCCFF"
                HorizontalAlignment="Right" Margin="0,0,10,0" FontSize="18"/>
             </Grid>
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#CCCCCCCC" Offset="0" />
-                    <GradientStop Color="#EEEEEEEE" Offset="1" />
+                    <GradientStop Color="#6633FF" Offset="0" />
+                    <GradientStop Color="#AAAAFF" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
@@ -46,7 +46,7 @@
         </StackPanel>
         <Grid Grid.Row="2" Grid.Column="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
         </Grid>
