@@ -62,14 +62,16 @@
             Margin="5"
             Background="#FFC1C1FF"
             CornerRadius="10">
-            <StackPanel Orientation="Vertical">
+            <StackPanel x:Name="stckpnl" Orientation="Vertical">
                 <TextBox
+                    x:Name="login"
                     Margin="5,0,5,0"
                     materialDesign:HintAssist.Hint="Логин"
                     Background="Transparent"
                     BorderThickness="0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
                 <TextBox
+                    x:Name="password"
                     Margin="5,0,5,0"
                     materialDesign:HintAssist.Hint="Пароль"
                     Background="Transparent"
@@ -96,6 +98,30 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
+            <Border
+                Grid.Column="0"
+                Height="Auto"
+                Margin="0,0,2.5,0"
+                VerticalAlignment="Top"
+                Background="#FFC1C1FF"
+                CornerRadius="10">
+                <StackPanel x:Name="localDirs" Orientation="Vertical">
+                    <Grid Margin="4">
+                        <Label VerticalAlignment="Center" Content="123123" />
+                        <Button
+                            Width="20"
+                            Height="20"
+                            Margin="0,0,3,0"
+                            Padding="0,0,0,5"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="✕"
+                            Style="{StaticResource MaterialDesignFlatMidBgButton}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Window>
