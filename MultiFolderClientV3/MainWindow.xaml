@@ -87,6 +87,7 @@
                     materialDesign:ButtonAssist.CornerRadius="5"
                     Click="editButton_Click"
                     Content="Изменить"
+                    Cursor="Hand"
                     FontSize="12"
                     Foreground="#CCCCFF"
                     Style="{StaticResource MaterialDesignFlatMidBgButton}" />
