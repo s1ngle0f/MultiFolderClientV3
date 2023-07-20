@@ -78,12 +78,14 @@
                     BorderThickness="0"
                     Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
                 <Button
+                    x:Name="editButton"
                     Width="75"
                     Height="25"
                     Margin="0,7,0,0"
                     Padding="0,0,0,2.5"
                     HorizontalAlignment="Center"
                     materialDesign:ButtonAssist.CornerRadius="5"
+                    Click="editButton_Click"
                     Content="Изменить"
                     FontSize="12"
                     Foreground="#CCCCFF"

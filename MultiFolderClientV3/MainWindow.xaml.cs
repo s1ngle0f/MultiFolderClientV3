@@ -143,6 +143,9 @@ namespace MultiFolderClientV3
             return null; //Стереть потом!!!!!!
         }
 
+        private void editButton_Click(object sender, RoutedEventArgs e)
+        {
 
+        }
     }
 }
