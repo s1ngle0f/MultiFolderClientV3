@@ -17,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Media.Animation;
+using System.Threading;
 
 namespace MultiFolderClientV3
 {
@@ -145,7 +147,58 @@ namespace MultiFolderClientV3
 
         private void editButton_Click(object sender, RoutedEventArgs e)
         {
+            login_LostFocus(sender, e);
+        }
 
+        private void login_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if(stackPanelAnimation.Visibility == Visibility.Hidden)
+            {
+                // Показываем StackPanel с анимацией
+                stackPanelAnimation.Visibility = Visibility.Visible;
+
+                // Создаем анимацию для перемещения вниз
+                DoubleAnimation slideAnimation = new DoubleAnimation
+                {
+                    From = -50,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    FillBehavior = FillBehavior.Stop
+                };
+
+                // Применяем анимацию к вертикальному смещению StackPanel
+                TranslateTransform transform = new TranslateTransform();
+                stackPanelAnimation.RenderTransform = transform;
+                transform.BeginAnimation(TranslateTransform.YProperty, slideAnimation);
+            }
+        }
+
+        private void login_LostFocus(object sender, RoutedEventArgs e)
+        {
+            // Создаем анимацию для перемещения вниз
+            DoubleAnimation slideAnimation = new DoubleAnimation
+            {
+                From = 0,
+                To = -50,
+                Duration = TimeSpan.FromSeconds(0.3),
+                FillBehavior = FillBehavior.Stop
+            };
+
+            // Применяем анимацию к вертикальному смещению StackPanel
+            TranslateTransform transform = new TranslateTransform();
+            stackPanelAnimation.RenderTransform = transform;
+            transform.BeginAnimation(TranslateTransform.YProperty, slideAnimation);
+
+            Thread thread = new Thread(() =>
+            {
+                Thread.Sleep(230);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    stackPanelAnimation.Visibility = Visibility.Hidden;
+                });
+            });
+
+            thread.Start();
         }
     }
 }

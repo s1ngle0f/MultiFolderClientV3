@@ -62,35 +62,43 @@
             Margin="5"
             Background="#FFC1C1FF"
             CornerRadius="10">
-            <StackPanel x:Name="stckpnl" Orientation="Vertical">
-                <TextBox
-                    x:Name="login"
-                    Margin="5,0,5,0"
-                    materialDesign:HintAssist.Hint="Логин"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                <TextBox
-                    x:Name="password"
-                    Margin="5,0,5,0"
-                    materialDesign:HintAssist.Hint="Пароль"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
-                <Button
-                    x:Name="editButton"
-                    Width="75"
-                    Height="25"
-                    Margin="0,7,0,0"
-                    Padding="0,0,0,2.5"
-                    HorizontalAlignment="Center"
-                    materialDesign:ButtonAssist.CornerRadius="5"
-                    Click="editButton_Click"
-                    Content="Изменить"
-                    Cursor="Hand"
-                    FontSize="12"
-                    Foreground="#CCCCFF"
-                    Style="{StaticResource MaterialDesignFlatMidBgButton}" />
+            <StackPanel x:Name="authStackPanel" Orientation="Vertical">
+                <StackPanel x:Name="loginStackPanel" Orientation="Vertical">
+                    <TextBox
+                        x:Name="login"
+                        Margin="5,0,5,0"
+                        materialDesign:HintAssist.Hint="Логин"
+                        Background="#FFC1C1FF"
+                        BorderThickness="0"
+                        GotFocus="login_GotFocus"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                </StackPanel>
+                <StackPanel
+                    x:Name="stackPanelAnimation"
+                    Orientation="Vertical"
+                    Visibility="Hidden">
+                    <TextBox
+                        x:Name="password"
+                        Margin="5,0,5,0"
+                        materialDesign:HintAssist.Hint="Пароль"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}" />
+                    <Button
+                        x:Name="editButton"
+                        Width="75"
+                        Height="25"
+                        Margin="0,7,0,0"
+                        Padding="0,0,0,2.5"
+                        HorizontalAlignment="Center"
+                        materialDesign:ButtonAssist.CornerRadius="5"
+                        Click="editButton_Click"
+                        Content="Изменить"
+                        Cursor="Hand"
+                        FontSize="12"
+                        Foreground="#CCCCFF"
+                        Style="{StaticResource MaterialDesignFlatMidBgButton}" />
+                </StackPanel>
             </StackPanel>
         </Border>
         <Grid
