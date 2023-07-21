@@ -31,6 +31,8 @@ namespace MultiFolderClientV3
         public MainWindow()
         {
             InitializeComponent();
+            DeleteDirsBlock();
+            MyInit();
             // var localDirs = GetLocalDirs();
             // AddLocalDirs(localDirs);
         }
@@ -153,7 +155,7 @@ namespace MultiFolderClientV3
                                   "xmlns:x = \"http://schemas.microsoft.com/winfx/2006/xaml\" " +
                                   "xmlns:d = \"http://schemas.microsoft.com/expression/blend/2008\" " +
                                   "Margin =\"4\">" +
-                                  $"    <Label VerticalAlignment=\"Center\" Content=\"{localDir}\" />" +
+                                  $"    <Label VerticalAlignment=\"Center\" Content=\"{System.IO.Path.GetFileName(localDir)}\" />" +
                                   "    <Button" +
                                   "        Width=\"20\"" +
                                   "        Height=\"20\"" +
