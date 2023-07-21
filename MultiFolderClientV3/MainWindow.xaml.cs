@@ -48,6 +48,85 @@ namespace MultiFolderClientV3
             ////UpdateDirsBlock();
         }
 
+        private void editButton_Click(object sender, RoutedEventArgs e)
+        {
+            _app?.Stop();
+            ChangeAccount(this.login.Text, this.password.Text);
+            _app?.Start();
+        }
+
+        private void ChangeAccount(string login, string password)
+        {
+            if (_app.multifolder.IsExistUserByPassword(login, password))
+            {
+                SetNewLoginPassword(login, password);
+                login_LostFocus();
+                UpdateDirsBlock();
+            }
+            UpdateLoginPassword();
+        }
+
+        private void UpdateLoginPassword()
+        {
+            using (StreamReader sr = File.OpenText(_settingsPath))
+            {
+                Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(sr.ReadToEnd());
+                var login = (string)data["login"];
+                this.login.Text = login;
+                this.password.Text = "";
+            }
+        }
+
+        private void SetNewLoginPassword(string login, string password)
+        {
+            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    string json = streamReader.ReadToEnd();
+                    dynamic data = JsonConvert.DeserializeObject(json);
+
+                    string lastLogin = data.login;
+                    string lastUserToken = data.userToken;
+
+                    if (data.history[login] == null)
+                    {
+                        dynamic historyObject = new { directories = new string[0] };
+                        data.history[login] = JObject.FromObject(historyObject);
+                    }
+                    if (data.history[lastLogin] == null && lastLogin != "")
+                    {
+                        dynamic historyObject = new { directories = new string[0] };
+                        data.history[lastLogin] = JObject.FromObject(historyObject);
+                    }
+                    if (lastLogin != "")
+                        data.history[lastLogin].directories = data.directories;
+                    data.directories = data.history[login].directories;
+                    data.login = login;
+                    string userToken = _app.multifolder.Authorization(login, password);
+                    data.userToken = userToken;
+                    json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                    streamReader.BaseStream.SetLength(0);
+                    streamReader.BaseStream.Position = 0;
+                    var writer = new StreamWriter(streamReader.BaseStream);
+                    writer.Write(json);
+                    writer.Flush();
+
+                    _app?.multifolder.SetLogin(login);
+                    _app?.multifolder.SetUserToken(userToken);
+                }
+            }
+        }
+
+        private void UpdateDirsBlock()
+        {
+            if (_app.multifolder.IsExistUser())
+            {
+                DeleteDirsBlock();
+                ShowDirsBlock();
+            }
+        }
+
         private void ShowDirsBlock()
         {
             var localDirs = GetLocalDirs(_app);
@@ -55,6 +134,11 @@ namespace MultiFolderClientV3
             var serverDirsAdd = HelpFunctions.CompareLists(localDirs.Select(path => System.IO.Path.GetFileName(path)).ToList(), serverDirs)["add"];
             AddLocalDirs(localDirs);
             AddServerDirs(serverDirsAdd);
+        }
+
+        private void DeleteDirsBlock()
+        {
+
         }
 
         private void AddLocalDirs(List<string> localDirs)
@@ -105,31 +189,6 @@ namespace MultiFolderClientV3
             return false;
         }
 
-        private void UpdateLoginPassword()
-        {
-            using (StreamReader sr = File.OpenText(_settingsPath))
-            {
-                Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(sr.ReadToEnd());
-                var login = (string)data["login"];
-                this.login.Text = login;
-                this.password.Text = "";
-            }
-        }
-
-        private void DeleteDirsBlock()
-        {
-            
-        }
-
-        private void UpdateDirsBlock()
-        {
-            if (_app.multifolder.IsExistUser())
-            {
-                DeleteDirsBlock();
-                ShowDirsBlock();
-            }
-        }
-
         //public string ShowFolderBrowserDialog()
         //{
         //    using (var folderBrowserDialog = new FolderBrowserDialog())
@@ -151,65 +210,6 @@ namespace MultiFolderClientV3
         //        }
         //    }
         //}
-
-        private void editButton_Click(object sender, RoutedEventArgs e)
-        {
-            _app?.Stop();
-            ChangeAccount(this.login.Text, this.password.Text);
-            _app?.Start();
-        }
-
-        private void ChangeAccount(string login, string password)
-        {
-            if (_app.multifolder.IsExistUserByPassword(login, password))
-            {
-                SetNewLoginPassword(login, password);
-                login_LostFocus();
-                UpdateDirsBlock();
-            }
-            UpdateLoginPassword();
-        }
-
-        private void SetNewLoginPassword(string login, string password)
-        {
-            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-            {
-                using (var streamReader = new StreamReader(fileStream))
-                {
-                    string json = streamReader.ReadToEnd();
-                    dynamic data = JsonConvert.DeserializeObject(json);
-
-                    string lastLogin = data.login;
-                    string lastUserToken = data.userToken;
-
-                    if (data.history[login] == null)
-                    {
-                        dynamic historyObject = new { directories = new string[0] };
-                        data.history[login] = JObject.FromObject(historyObject);
-                    }
-                    if (data.history[lastLogin] == null && lastLogin != "")
-                    {
-                        dynamic historyObject = new { directories = new string[0] };
-                        data.history[lastLogin] = JObject.FromObject(historyObject);
-                    }
-                    if (lastLogin != "")
-                        data.history[lastLogin].directories = data.directories;
-                    data.directories = data.history[login].directories;
-                    data.login = login;
-                    string userToken = _app.multifolder.Authorization(login, password);
-                    data.userToken = userToken;
-                    json = JsonConvert.SerializeObject(data, Formatting.Indented);
-                    streamReader.BaseStream.SetLength(0);
-                    streamReader.BaseStream.Position = 0;
-                    var writer = new StreamWriter(streamReader.BaseStream);
-                    writer.Write(json);
-                    writer.Flush();
-
-                    _app?.multifolder.SetLogin(login);
-                    _app?.multifolder.SetUserToken(userToken);
-                }
-            }
-        }
 
         private void login_GotFocus(object sender, RoutedEventArgs e)
         {
