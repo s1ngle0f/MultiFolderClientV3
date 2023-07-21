@@ -76,7 +76,7 @@
                 <StackPanel
                     x:Name="stackPanelAnimation"
                     Orientation="Vertical"
-                    Visibility="Hidden">
+                    Visibility="Collapsed">
                     <TextBox
                         x:Name="password"
                         Margin="5,0,5,0"
@@ -99,6 +99,20 @@
                         Foreground="#CCCCFF"
                         Style="{StaticResource MaterialDesignFlatMidBgButton}" />
                 </StackPanel>
+                <Button
+                    x:Name="testButton"
+                    Width="100"
+                    Height="35"
+                    Margin="0,7,0,0"
+                    Padding="0,0,0,2.5"
+                    HorizontalAlignment="Center"
+                    materialDesign:ButtonAssist.CornerRadius="5"
+                    Click="TestButton_OnClickButton_Click"
+                    Content="TEST"
+                    Cursor="Hand"
+                    FontSize="12"
+                    Foreground="#CCCCFF"
+                    Style="{StaticResource MaterialDesignFlatAccentBgButton}" />
             </StackPanel>
         </Border>
         <Grid
@@ -117,7 +131,7 @@
                 Background="#FFC1C1FF"
                 CornerRadius="10">
                 <StackPanel x:Name="localDirs" Orientation="Vertical">
-                    <Grid Margin="4">
+                    <Grid x:Name="templateLocal" Margin="4">
                         <Label VerticalAlignment="Center" Content="123123" />
                         <Button
                             Width="20"
@@ -129,6 +143,30 @@
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Content="✕"
+                            Style="{StaticResource MaterialDesignFlatMidBgButton}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border
+                Grid.Column="1"
+                Height="Auto"
+                Margin="2.5,0,0,0"
+                VerticalAlignment="Top"
+                Background="#FFC1C1FF"
+                CornerRadius="10">
+                <StackPanel x:Name="serverDirs" Orientation="Vertical">
+                    <Grid x:Name="templateServer" Margin="4">
+                        <Label VerticalAlignment="Center" Content="321321" />
+                        <Button
+                            Width="20"
+                            Height="20"
+                            Margin="0,0,3,0"
+                            Padding="0,0,0,5"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Content="+"
                             Style="{StaticResource MaterialDesignFlatMidBgButton}" />
                     </Grid>
                 </StackPanel>

@@ -138,23 +138,63 @@ namespace MultiFolderClientV3
 
         private void DeleteDirsBlock()
         {
-
+            this.localDirs.Children.Clear();
+            //this.serverDirs.Children.Clear();
         }
 
         private void AddLocalDirs(List<string> localDirs)
         {
-            string xamlInfo = @"";
-            
+            foreach (var localDir in localDirs)
+            {
+                string xamlInfo = "<Grid xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" " +
+                                  "xmlns:x = \"http://schemas.microsoft.com/winfx/2006/xaml\" " +
+                                  "xmlns:d = \"http://schemas.microsoft.com/expression/blend/2008\" " +
+                                  "Margin =\"4\">" +
+                                  $"    <Label VerticalAlignment=\"Center\" Content=\"{localDir}\" />" +
+                                  "    <Button" +
+                                  "        Width=\"20\"" +
+                                  "        Height=\"20\"" +
+                                  "        Margin=\"0,0,3,0\"" +
+                                  "        Padding=\"0,0,0,5\"" +
+                                  "        HorizontalAlignment=\"Right\"" +
+                                  "        VerticalAlignment=\"Center\"" +
+                                  "        HorizontalContentAlignment=\"Center\"" +
+                                  "        VerticalContentAlignment=\"Center\"" +
+                                  "        Content=\"✕\"" +
+                                  "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
+                                  "</Grid>";
+                AddXamlControlToControl<Grid>(xamlInfo, this.localDirs);
+            }
         }
 
         private void AddServerDirs(List<string> serverDirs)
         {
-            
+            foreach (var serverDir in serverDirs)
+            {
+                string xamlInfo = "<Grid xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" " +
+                                  "xmlns:x = \"http://schemas.microsoft.com/winfx/2006/xaml\" " +
+                                  "xmlns:d = \"http://schemas.microsoft.com/expression/blend/2008\" " +
+                                  "Margin =\"4\">" +
+                                  $"    <Label VerticalAlignment=\"Center\" Content=\"{serverDir}\" />" +
+                                  "    <Button" +
+                                  "        Width=\"20\"" +
+                                  "        Height=\"20\"" +
+                                  "        Margin=\"0,0,3,0\"" +
+                                  "        Padding=\"0,0,0,5\"" +
+                                  "        HorizontalAlignment=\"Right\"" +
+                                  "        VerticalAlignment=\"Center\"" +
+                                  "        HorizontalContentAlignment=\"Center\"" +
+                                  "        VerticalContentAlignment=\"Center\"" +
+                                  "        Content=\"+\"" +
+                                  "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
+                                  "</Grid>";
+                AddXamlControlToControl<Grid>(xamlInfo, this.serverDirs);
+            }
         }
 
         private void AddXamlControlToControl<T>(string xamlControl, IAddChild control)
         {
-            T newControl = (T)XamlReader.Parse(xamlControl);
+            T newControl = (T) XamlReader.Parse(xamlControl);
             control.AddChild(newControl);
         }
 
@@ -213,7 +253,7 @@ namespace MultiFolderClientV3
 
         private void login_GotFocus(object sender, RoutedEventArgs e)
         {
-            if(stackPanelAnimation.Visibility == Visibility.Hidden)
+            if(stackPanelAnimation.Visibility == Visibility.Collapsed)
             {
                 // Показываем StackPanel с анимацией
                 stackPanelAnimation.Visibility = Visibility.Visible;
@@ -236,30 +276,47 @@ namespace MultiFolderClientV3
 
         private void login_LostFocus()
         {
-            // Создаем анимацию для перемещения вниз
-            DoubleAnimation slideAnimation = new DoubleAnimation
+            if (stackPanelAnimation.Visibility == Visibility.Visible)
             {
-                From = 0,
-                To = -50,
-                Duration = TimeSpan.FromSeconds(0.3),
-                FillBehavior = FillBehavior.Stop
-            };
-
-            // Применяем анимацию к вертикальному смещению StackPanel
-            TranslateTransform transform = new TranslateTransform();
-            stackPanelAnimation.RenderTransform = transform;
-            transform.BeginAnimation(TranslateTransform.YProperty, slideAnimation);
-
-            Thread thread = new Thread(() =>
-            {
-                Thread.Sleep(230);
-                Application.Current.Dispatcher.Invoke(() =>
+                // Создаем анимацию для перемещения вверх
+                DoubleAnimation slideAnimation = new DoubleAnimation
                 {
-                    stackPanelAnimation.Visibility = Visibility.Hidden;
-                });
-            });
+                    From = 0,
+                    To = -50,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    FillBehavior = FillBehavior.Stop
+                };
 
-            thread.Start();
+                // Применяем анимацию к вертикальному смещению StackPanel
+                TranslateTransform transform = new TranslateTransform();
+                stackPanelAnimation.RenderTransform = transform;
+                transform.BeginAnimation(TranslateTransform.YProperty, slideAnimation);
+
+                Thread thread = new Thread(() =>
+                {
+                    Thread.Sleep(230);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        stackPanelAnimation.Visibility = Visibility.Collapsed;
+                    });
+                });
+
+                thread.Start();
+            }
+        }
+
+        private void TestButton_OnClickButton_Click(object sender, RoutedEventArgs e)
+        {
+            //AddLocalDirs(new List<string>()
+            //{
+            //    "Hello",
+            //    "Nigger"
+            //});
+            AddServerDirs(new List<string>()
+            {
+                "Hello",
+                "Nigger"
+            });
         }
     }
 }
