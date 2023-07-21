@@ -48,6 +48,7 @@
                     FontSize="18"
                     Foreground="#CCCCFF" />
                 <Label
+                    x:Name="labelUserName"
                     Margin="0,0,10,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
@@ -108,6 +109,7 @@
                     HorizontalAlignment="Center"
                     materialDesign:ButtonAssist.CornerRadius="5"
                     Click="TestButton_OnClickButton_Click"
+                    CommandParameter="Heelllooo"
                     Content="TEST"
                     Cursor="Hand"
                     FontSize="12"
@@ -142,6 +144,8 @@
                             VerticalAlignment="Center"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
+                            Click="deleteMethod"
+                            CommandParameter="Path/123123"
                             Content="✕"
                             Style="{StaticResource MaterialDesignFlatMidBgButton}" />
                     </Grid>
@@ -166,6 +170,8 @@
                             VerticalAlignment="Center"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
+                            Click="addMethod"
+                            CommandParameter="123123"
                             Content="+"
                             Style="{StaticResource MaterialDesignFlatMidBgButton}" />
                     </Grid>

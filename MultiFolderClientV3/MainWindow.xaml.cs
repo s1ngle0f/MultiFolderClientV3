@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Animation;
 using System.Threading;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace MultiFolderClientV3
 {
@@ -139,7 +140,7 @@ namespace MultiFolderClientV3
         private void DeleteDirsBlock()
         {
             this.localDirs.Children.Clear();
-            //this.serverDirs.Children.Clear();
+            this.serverDirs.Children.Clear();
         }
 
         private void AddLocalDirs(List<string> localDirs)
@@ -160,6 +161,8 @@ namespace MultiFolderClientV3
                                   "        VerticalAlignment=\"Center\"" +
                                   "        HorizontalContentAlignment=\"Center\"" +
                                   "        VerticalContentAlignment=\"Center\"" +
+                                  $"        CommandParameter=\"{localDir}\"" +
+                                  "        Click=\"deleteMethod\"" +
                                   "        Content=\"✕\"" +
                                   "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
                                   "</Grid>";
@@ -185,6 +188,8 @@ namespace MultiFolderClientV3
                                   "        VerticalAlignment=\"Center\"" +
                                   "        HorizontalContentAlignment=\"Center\"" +
                                   "        VerticalContentAlignment=\"Center\"" +
+                                  $"        CommandParameter=\"{serverDir}\"" +
+                                  "        Click=\"addMethod\"" +
                                   "        Content=\"+\"" +
                                   "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
                                   "</Grid>";
@@ -229,27 +234,47 @@ namespace MultiFolderClientV3
             return false;
         }
 
-        //public string ShowFolderBrowserDialog()
-        //{
-        //    using (var folderBrowserDialog = new FolderBrowserDialog())
-        //    {
-        //        // Если нужно, задаем начальную папку
-        //        // folderBrowserDialog.SelectedPath = "C:\\";
+        public string ShowFolderBrowserDialog()
+        {
+            // using (var folderBrowserDialog = new FolderBrowserDialog())
+            // {
+            //     // Если нужно, задаем начальную папку
+            //     // folderBrowserDialog.SelectedPath = "C:\\";
+            //
+            //     // Открываем диалоговое окно выбора папки
+            //     DialogResult result = folderBrowserDialog.ShowDialog();
+            //
+            //     // Если пользователь выбрал папку, возвращаем ее путь
+            //     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+            //     {
+            //         return folderBrowserDialog.SelectedPath;
+            //     }
+            //     else
+            //     {
+            //         return null;
+            //     }
+            // }
+            using (CommonOpenFileDialog dialog = new CommonOpenFileDialog())
+            {
+                dialog.IsFolderPicker = true;
 
-        //        // Открываем диалоговое окно выбора папки
-        //        DialogResult result = folderBrowserDialog.ShowDialog();
+                // Открываем диалоговое окно выбора папки
+                CommonFileDialogResult result = dialog.ShowDialog();
 
-        //        // Если пользователь выбрал папку, возвращаем ее путь
-        //        if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
-        //        {
-        //            return folderBrowserDialog.SelectedPath;
-        //        }
-        //        else
-        //        {
-        //            return null;
-        //        }
-        //    }
-        //}
+                // Проверяем результат выбора пользователя
+                if (result == CommonFileDialogResult.Ok)
+                {
+                    // Получаем выбранную папку
+                    string selectedPath = dialog.FileName;
+                    // Далее можно использовать полученный selectedPath, чтобы обработать выбранную папку.
+                    return selectedPath;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         private void login_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -305,6 +330,74 @@ namespace MultiFolderClientV3
             }
         }
 
+        private void addMethod(object sender, RoutedEventArgs e)
+        {
+            var name = ((Button)(sender)).CommandParameter.ToString();
+            var path = System.IO.Path.Combine(ShowFolderBrowserDialog(), name);
+            bool isWork = false;
+            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    string json = streamReader.ReadToEnd();
+                    dynamic data = JsonConvert.DeserializeObject(json);
+
+                    if (!Directory.Exists(path) && !DirsContainsPath(path, data.directories))
+                    {
+                        data.directories.Add(path);
+                        json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                        streamReader.BaseStream.SetLength(0);
+                        streamReader.BaseStream.Position = 0;
+                        var writer = new StreamWriter(streamReader.BaseStream);
+                        writer.Write(json);
+                        writer.Flush();
+                        isWork = true;
+                        this.localDirs.Children.Clear();
+                        this.serverDirs.Children.Clear();
+                    }
+                }
+            }
+            if (isWork)
+                ShowDirsBlock();
+        }
+
+        private void deleteMethod(object sender, RoutedEventArgs e)
+        {
+            var path = ((Button)(sender)).CommandParameter.ToString();
+            bool isWork = false;
+            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    string json = streamReader.ReadToEnd();
+
+                    Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                    List<string> dirPaths = JsonConvert.DeserializeObject<List<string>>(data["directories"].ToString());
+
+                    for (int i = 0; i < dirPaths.Count; i++)
+                    {
+                        if (dirPaths[i] == path)
+                        {
+                            dirPaths.Remove(path);
+                            data["directories"] = dirPaths;
+                            json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                            streamReader.BaseStream.SetLength(0);
+                            streamReader.BaseStream.Position = 0;
+                            var writer = new StreamWriter(streamReader.BaseStream);
+                            writer.Write(json);
+                            writer.Flush();
+                            isWork = true;
+                            this.localDirs.Children.Clear();
+                            this.serverDirs.Children.Clear();
+                            break;
+                        }
+                    }
+                }
+            }
+            if (isWork)
+                ShowDirsBlock();
+        }
+
         private void TestButton_OnClickButton_Click(object sender, RoutedEventArgs e)
         {
             //AddLocalDirs(new List<string>()
@@ -312,11 +405,13 @@ namespace MultiFolderClientV3
             //    "Hello",
             //    "Nigger"
             //});
-            AddServerDirs(new List<string>()
-            {
-                "Hello",
-                "Nigger"
-            });
+            // this.labelUserName.Content = ((Button)(sender)).CommandParameter.ToString();
+            // this.labelUserName.Content = ShowFolderBrowserDialog();
+            // AddServerDirs(new List<string>()
+            // {
+            //     "Hello",
+            //     "Nigger"
+            // });
         }
     }
 }
