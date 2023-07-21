@@ -31,6 +31,8 @@ namespace MultiFolderClientV3
         public MainWindow()
         {
             InitializeComponent();
+            // var localDirs = GetLocalDirs();
+            // AddLocalDirs(localDirs);
         }
 
         Synchronizer _app;
@@ -130,7 +132,7 @@ namespace MultiFolderClientV3
 
         private void ShowDirsBlock()
         {
-            var localDirs = GetLocalDirs(_app);
+            var localDirs = GetLocalDirs();
             var serverDirs = _app.multifolder.GetDirs();
             var serverDirsAdd = HelpFunctions.CompareLists(localDirs.Select(path => System.IO.Path.GetFileName(path)).ToList(), serverDirs)["add"];
             AddLocalDirs(localDirs);
@@ -162,11 +164,11 @@ namespace MultiFolderClientV3
                                   "        HorizontalContentAlignment=\"Center\"" +
                                   "        VerticalContentAlignment=\"Center\"" +
                                   $"        CommandParameter=\"{localDir}\"" +
-                                  "        Click=\"deleteMethod\"" +
+                                  // "        Click=\"deleteMethod\"" +
                                   "        Content=\"✕\"" +
                                   "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
                                   "</Grid>";
-                AddXamlControlToControl<Grid>(xamlInfo, this.localDirs);
+                AddXamlControlToControl<Grid>(xamlInfo, this.localDirs, deleteMethod, localDir);
             }
         }
 
@@ -189,21 +191,35 @@ namespace MultiFolderClientV3
                                   "        HorizontalContentAlignment=\"Center\"" +
                                   "        VerticalContentAlignment=\"Center\"" +
                                   $"        CommandParameter=\"{serverDir}\"" +
-                                  "        Click=\"addMethod\"" +
+                                  // "        Click=\"addMethod\"" +
                                   "        Content=\"+\"" +
                                   "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
                                   "</Grid>";
-                AddXamlControlToControl<Grid>(xamlInfo, this.serverDirs);
+                AddXamlControlToControl<Grid>(xamlInfo, this.serverDirs, addMethod, serverDir);
             }
         }
 
-        private void AddXamlControlToControl<T>(string xamlControl, IAddChild control)
+        private void AddXamlControlToControl<T>(string xamlControl, IAddChild control, Action<string> method = null, string commandParameter = null)
         {
             T newControl = (T) XamlReader.Parse(xamlControl);
+            
+            if (newControl is DependencyObject dependencyObject)
+            {
+                int count = VisualTreeHelper.GetChildrenCount(dependencyObject);
+                for (int i = 0; i < count; i++)
+                {
+                    DependencyObject child = VisualTreeHelper.GetChild(dependencyObject, i);
+                    if (child is Button button)
+                    {
+                        button.Click += new RoutedEventHandler((sender, e) => method(commandParameter)); // Привязываем обработчик события к найденной кнопке
+                    }
+                }
+            }
+
             control.AddChild(newControl);
         }
 
-        private List<string> GetLocalDirs(Synchronizer app)
+        private List<string> GetLocalDirs()
         {
             //List<string> localPaths = new List<string>();
             //foreach (DirectoryRepo dir in app.directories)
@@ -330,9 +346,9 @@ namespace MultiFolderClientV3
             }
         }
 
-        private void addMethod(object sender, RoutedEventArgs e)
+        private void addMethod(string name)
         {
-            var name = ((Button)(sender)).CommandParameter.ToString();
+            // var name = ((Button)(sender)).CommandParameter.ToString();
             var path = System.IO.Path.Combine(ShowFolderBrowserDialog(), name);
             bool isWork = false;
             using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
@@ -361,9 +377,9 @@ namespace MultiFolderClientV3
                 ShowDirsBlock();
         }
 
-        private void deleteMethod(object sender, RoutedEventArgs e)
+        private void deleteMethod(string path)
         {
-            var path = ((Button)(sender)).CommandParameter.ToString();
+            // var path = ((Button)(sender)).CommandParameter.ToString();
             bool isWork = false;
             using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {

@@ -144,7 +144,6 @@
                             VerticalAlignment="Center"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
-                            Click="deleteMethod"
                             CommandParameter="Path/123123"
                             Content="✕"
                             Style="{StaticResource MaterialDesignFlatMidBgButton}" />
@@ -170,9 +169,9 @@
                             VerticalAlignment="Center"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
-                            Click="addMethod"
                             CommandParameter="123123"
                             Content="+"
+                            Cursor="Hand"
                             Style="{StaticResource MaterialDesignFlatMidBgButton}" />
                     </Grid>
                 </StackPanel>
