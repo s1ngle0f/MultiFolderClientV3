@@ -32,22 +32,17 @@ namespace MultiFolderClientV3
             InitializeComponent();
         }
 
-        Synchronizer app;
-        private string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
+        Synchronizer _app;
+        private string _settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
         private void MyInit()
         {
-            app = new Synchronizer();
-            app.Start();
+            _app = new Synchronizer();
+            _app.Start();
             UpdateLoginPassword();
-            if (app.multifolder.IsExistUser())
+            if (_app.multifolder.IsExistUser())
             {
-                this.login.Text = app.multifolder.login;
-                //TurnOnFunctional();
+                this.login.Text = _app.multifolder.login;
                 ShowDirsBlock();
-            }
-            else
-            {
-                //TurnOnChangeAccount();
             }
             ////DeleteDirsBlock();
             ////UpdateDirsBlock();
@@ -55,8 +50,8 @@ namespace MultiFolderClientV3
 
         private void ShowDirsBlock()
         {
-            var localDirs = getLocalDirs(app);
-            var serverDirs = app.multifolder.GetDirs();
+            var localDirs = GetLocalDirs(_app);
+            var serverDirs = _app.multifolder.GetDirs();
             var serverDirsAdd = HelpFunctions.CompareLists(localDirs.Select(path => System.IO.Path.GetFileName(path)).ToList(), serverDirs)["add"];
             AddLocalDirs(localDirs);
             AddServerDirs(serverDirsAdd);
@@ -73,13 +68,13 @@ namespace MultiFolderClientV3
             
         }
 
-        private void AddXAMLControlToControl<T>(string xamlControl, IAddChild control)
+        private void AddXamlControlToControl<T>(string xamlControl, IAddChild control)
         {
             T newControl = (T)XamlReader.Parse(xamlControl);
             control.AddChild(newControl);
         }
 
-        private List<string> getLocalDirs(Synchronizer app)
+        private List<string> GetLocalDirs(Synchronizer app)
         {
             //List<string> localPaths = new List<string>();
             //foreach (DirectoryRepo dir in app.directories)
@@ -87,7 +82,7 @@ namespace MultiFolderClientV3
             //    localPaths.Add(dir.full_path);
             //}
             //return localPaths;
-            using (var fileStream = new FileStream(settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 using (var streamReader = new StreamReader(fileStream))
                 {
@@ -100,7 +95,7 @@ namespace MultiFolderClientV3
             }
         }
 
-        private bool dirsContainsPath(string path, JArray dirs)
+        private bool DirsContainsPath(string path, JArray dirs)
         {
             foreach (string dir in dirs)
             {
@@ -112,7 +107,7 @@ namespace MultiFolderClientV3
 
         private void UpdateLoginPassword()
         {
-            using (StreamReader sr = File.OpenText(settingsPath))
+            using (StreamReader sr = File.OpenText(_settingsPath))
             {
                 Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(sr.ReadToEnd());
                 var login = (string)data["login"];
@@ -121,33 +116,99 @@ namespace MultiFolderClientV3
             }
         }
 
-        public string ShowFolderBrowserDialog()
+        private void DeleteDirsBlock()
         {
-            //using (var folderBrowserDialog = new FolderBrowserDialog())
-            //{
-            //    // Если нужно, задаем начальную папку
-            //    // folderBrowserDialog.SelectedPath = "C:\\";
-
-            //    // Открываем диалоговое окно выбора папки
-            //    DialogResult result = folderBrowserDialog.ShowDialog();
-
-            //    // Если пользователь выбрал папку, возвращаем ее путь
-            //    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
-            //    {
-            //        return folderBrowserDialog.SelectedPath;
-            //    }
-            //    else
-            //    {
-            //        return null;
-            //    }
-            //}
-
-            return null; //Стереть потом!!!!!!
+            
         }
+
+        private void UpdateDirsBlock()
+        {
+            if (_app.multifolder.IsExistUser())
+            {
+                DeleteDirsBlock();
+                ShowDirsBlock();
+            }
+        }
+
+        //public string ShowFolderBrowserDialog()
+        //{
+        //    using (var folderBrowserDialog = new FolderBrowserDialog())
+        //    {
+        //        // Если нужно, задаем начальную папку
+        //        // folderBrowserDialog.SelectedPath = "C:\\";
+
+        //        // Открываем диалоговое окно выбора папки
+        //        DialogResult result = folderBrowserDialog.ShowDialog();
+
+        //        // Если пользователь выбрал папку, возвращаем ее путь
+        //        if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+        //        {
+        //            return folderBrowserDialog.SelectedPath;
+        //        }
+        //        else
+        //        {
+        //            return null;
+        //        }
+        //    }
+        //}
 
         private void editButton_Click(object sender, RoutedEventArgs e)
         {
-            login_LostFocus(sender, e);
+            _app?.Stop();
+            ChangeAccount(this.login.Text, this.password.Text);
+            _app?.Start();
+        }
+
+        private void ChangeAccount(string login, string password)
+        {
+            if (_app.multifolder.IsExistUserByPassword(login, password))
+            {
+                SetNewLoginPassword(login, password);
+                login_LostFocus();
+                UpdateDirsBlock();
+            }
+            UpdateLoginPassword();
+        }
+
+        private void SetNewLoginPassword(string login, string password)
+        {
+            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    string json = streamReader.ReadToEnd();
+                    dynamic data = JsonConvert.DeserializeObject(json);
+
+                    string lastLogin = data.login;
+                    string lastUserToken = data.userToken;
+
+                    if (data.history[login] == null)
+                    {
+                        dynamic historyObject = new { directories = new string[0] };
+                        data.history[login] = JObject.FromObject(historyObject);
+                    }
+                    if (data.history[lastLogin] == null && lastLogin != "")
+                    {
+                        dynamic historyObject = new { directories = new string[0] };
+                        data.history[lastLogin] = JObject.FromObject(historyObject);
+                    }
+                    if (lastLogin != "")
+                        data.history[lastLogin].directories = data.directories;
+                    data.directories = data.history[login].directories;
+                    data.login = login;
+                    string userToken = _app.multifolder.Authorization(login, password);
+                    data.userToken = userToken;
+                    json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                    streamReader.BaseStream.SetLength(0);
+                    streamReader.BaseStream.Position = 0;
+                    var writer = new StreamWriter(streamReader.BaseStream);
+                    writer.Write(json);
+                    writer.Flush();
+
+                    _app?.multifolder.SetLogin(login);
+                    _app?.multifolder.SetUserToken(userToken);
+                }
+            }
         }
 
         private void login_GotFocus(object sender, RoutedEventArgs e)
@@ -173,7 +234,7 @@ namespace MultiFolderClientV3
             }
         }
 
-        private void login_LostFocus(object sender, RoutedEventArgs e)
+        private void login_LostFocus()
         {
             // Создаем анимацию для перемещения вниз
             DoubleAnimation slideAnimation = new DoubleAnimation

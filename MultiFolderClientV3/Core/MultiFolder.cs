@@ -30,6 +30,16 @@ namespace MultiFolderClientV3
             auth = new Dictionary<string, string> { { "login", login }, { "userToken", userToken } };
         }
 
+        public void SetLogin(string login)
+        {
+            this.login = login;
+        }
+
+        public void SetUserToken(string userToken)
+        {
+            this.userToken = userToken;
+        }
+
         public string GenerateSshRemote(string server_dir_name)
         {
             return $"ssh://{login}@{ip_addr}/~/git/{server_dir_name}.git";
