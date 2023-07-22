@@ -33,6 +33,9 @@ namespace MultiFolderClientV3
             InitializeComponent();
             DeleteDirsBlock();
             MyInit();
+            InitNotifyIcon();
+
+            //Тесты
             // var localDirs = GetLocalDirs();
             // AddLocalDirs(localDirs);
         }
@@ -511,13 +514,63 @@ namespace MultiFolderClientV3
 
         private void ExitButton_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            _app?.Stop(); //Потом удалить и переместить в Quit
-            this.Close();
+            // _app?.Stop(); //Потом удалить и переместить в Quit
+            // this.Close();
+            HideWindow();
         }
 
         private void AddNewFolder_Click(object sender, RoutedEventArgs e)
         {
             AddMethod();
         }
+
+        #region NotifyIcon
+        private System.Windows.Forms.NotifyIcon notifyIcon;
+        private void InitNotifyIcon()
+        {
+            notifyIcon = new System.Windows.Forms.NotifyIcon();
+            string iconPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/dolphin.ico";
+            notifyIcon.Icon = new System.Drawing.Icon(iconPath);
+
+            // Create a context menu for the icon
+            System.Windows.Forms.ContextMenu menu = new System.Windows.Forms.ContextMenu();
+            menu.MenuItems.Add(new System.Windows.Forms.MenuItem("Show", ShowWindow));
+            menu.MenuItems.Add(new System.Windows.Forms.MenuItem("Quit", QuitWindow));
+
+            // Assign the context menu to the icon
+            notifyIcon.ContextMenu = menu;
+        }
+
+        private void QuitWindow(object sender, EventArgs e)
+        {
+            notifyIcon.Visible = false;
+            notifyIcon.Dispose();
+            this._app?.Stop();
+            Application.Current.Shutdown();
+        }
+
+        private void ShowWindow(object sender, EventArgs e)
+        {
+            notifyIcon.Visible = false;
+            Show();
+            WindowState = WindowState.Normal;
+        }
+
+        private void HideWindow()
+        {
+            Hide();
+            notifyIcon.Visible = true;
+        }
+
+        // protected void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        // {
+        //     e.Cancel = true;
+        //     Console.WriteLine(e.CloseReason);
+        //     if (e.CloseReason == CloseReason.UserClosing)
+        //         HideWindow();
+        //     else if (e.CloseReason == CloseReason.ApplicationExitCall)
+        //         base.Dispose();
+        // }
+        #endregion
     }
 }
