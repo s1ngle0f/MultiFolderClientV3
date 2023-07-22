@@ -467,5 +467,11 @@ namespace MultiFolderClientV3
         }
 
         #endregion
+
+        private void ExitButton_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _app?.Stop(); //Потом удалить и переместить в Quit
+            this.Close();
+        }
     }
 }
