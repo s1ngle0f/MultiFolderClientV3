@@ -380,6 +380,37 @@ namespace MultiFolderClientV3
                 ShowDirsBlock();
         }
 
+        private void AddMethod()
+        {
+            // var name = ((Button)(sender)).CommandParameter.ToString();
+            var path = ShowFolderBrowserDialog();
+            bool isWork = false;
+            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            {
+                using (var streamReader = new StreamReader(fileStream))
+                {
+                    string json = streamReader.ReadToEnd();
+                    dynamic data = JsonConvert.DeserializeObject(json);
+
+                    if (!Directory.Exists(path) && !DirsContainsPath(path, data.directories))
+                    {
+                        data.directories.Add(path);
+                        json = JsonConvert.SerializeObject(data, Formatting.Indented);
+                        streamReader.BaseStream.SetLength(0);
+                        streamReader.BaseStream.Position = 0;
+                        var writer = new StreamWriter(streamReader.BaseStream);
+                        writer.Write(json);
+                        writer.Flush();
+                        isWork = true;
+                        this.localDirs.Children.Clear();
+                        this.serverDirs.Children.Clear();
+                    }
+                }
+            }
+            if (isWork)
+                ShowDirsBlock();
+        }
+
         private void DeleteMethod(string path)
         {
             // var path = ((Button)(sender)).CommandParameter.ToString();
@@ -472,6 +503,11 @@ namespace MultiFolderClientV3
         {
             _app?.Stop(); //Потом удалить и переместить в Quit
             this.Close();
+        }
+
+        private void AddNewFolder_Click(object sender, RoutedEventArgs e)
+        {
+            AddMethod();
         }
     }
 }

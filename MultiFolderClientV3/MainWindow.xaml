@@ -41,7 +41,8 @@
                 Height="12"
                 Margin="3"
                 HorizontalAlignment="Right"
-                Source="/Source/close.png" MouseDown="ExitButton_MouseDown" />
+                MouseDown="ExitButton_MouseDown"
+                Source="/Source/close.png" />
         </Grid>
         <Border
             Grid.Row="1"
@@ -125,6 +126,22 @@
                     FontSize="12"
                     Foreground="#CCCCFF"
                     Style="{StaticResource MaterialDesignFlatAccentBgButton}"
+                    Visibility="Collapsed" />
+                <Button
+                    x:Name="AddNewFolder"
+                    Width="115"
+                    Height="25"
+                    Margin="0,7,0,0"
+                    Padding="0,0,0,2.5"
+                    HorizontalAlignment="Center"
+                    materialDesign:ButtonAssist.CornerRadius="5"
+                    Click="AddNewFolder_Click"
+                    CommandParameter="Heelllooo"
+                    Content="Добавить папку"
+                    Cursor="Hand"
+                    FontSize="12"
+                    Foreground="#CCCCFF"
+                    Style="{StaticResource MaterialDesignFlatMidBgButton}"
                     Visibility="Visible" />
             </StackPanel>
         </Border>
