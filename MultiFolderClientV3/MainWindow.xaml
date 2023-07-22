@@ -11,7 +11,7 @@
     ResizeMode="NoResize"
     WindowStyle="None"
     mc:Ignorable="d">
-    <Grid Background="#CCCCFF">
+    <Grid Background="#CCCCFF" MouseDown="Grid_MouseDown">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="175" />
             <ColumnDefinition />
@@ -22,10 +22,17 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid
+            x:Name="WindowTitleBar"
             Grid.Row="0"
             Grid.Column="0"
             Grid.ColumnSpan="2"
             Background="#6633FF">
+            <Button
+                x:Name="PlugForFocus"
+                Width="1"
+                Height="1"
+                HorizontalAlignment="Left"
+                Opacity="0" />
             <Image
                 Grid.Row="0"
                 Grid.Column="1"
@@ -114,7 +121,8 @@
                     Cursor="Hand"
                     FontSize="12"
                     Foreground="#CCCCFF"
-                    Style="{StaticResource MaterialDesignFlatAccentBgButton}" />
+                    Style="{StaticResource MaterialDesignFlatAccentBgButton}"
+                    Visibility="Visible" />
             </StackPanel>
         </Border>
         <Grid

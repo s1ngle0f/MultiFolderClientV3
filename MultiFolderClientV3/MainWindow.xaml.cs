@@ -78,6 +78,7 @@ namespace MultiFolderClientV3
                 Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(sr.ReadToEnd());
                 var login = (string)data["login"];
                 this.login.Text = login;
+                this.labelUserName.Content = login;
                 this.password.Text = "";
             }
         }
@@ -431,5 +432,40 @@ namespace MultiFolderClientV3
             //     "Nigger"
             // });
         }
+
+        #region Перетаскивание_ПотеряФокуса
+
+        // private void WindowTitleBar_MouseDown(object sender, MouseButtonEventArgs e)
+        // {
+        //     if (e.ChangedButton == MouseButton.Left)
+        //     {
+        //         this.PlugForFocus.Focus();
+        //         //Keyboard.ClearFocus();
+        //         login_LostFocus();
+        //         this.DragMove();
+        //     }
+        // }
+        //
+        // private void Border_MouseDown(object sender, MouseButtonEventArgs e)
+        // {
+        //     if (e.ChangedButton == MouseButton.Left)
+        //     {
+        //         this.PlugForFocus.Focus();
+        //         login_LostFocus();
+        //         this.DragMove();
+        //     }
+        // }
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                this.PlugForFocus.Focus();
+                login_LostFocus();
+                this.DragMove();
+            }
+        }
+
+        #endregion
     }
 }
