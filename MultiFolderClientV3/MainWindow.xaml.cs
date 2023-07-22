@@ -171,7 +171,7 @@ namespace MultiFolderClientV3
                                   "        Content=\"✕\"" +
                                   "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
                                   "</Grid>";
-                AddXamlControlToControl<Grid>(xamlInfo, this.localDirs, deleteMethod, localDir);
+                AddXamlControlToControl<Grid>(xamlInfo, this.localDirs, DeleteMethod, localDir);
             }
         }
 
@@ -198,7 +198,7 @@ namespace MultiFolderClientV3
                                   "        Content=\"+\"" +
                                   "        Style=\"{StaticResource MaterialDesignFlatMidBgButton}\" />" +
                                   "</Grid>";
-                AddXamlControlToControl<Grid>(xamlInfo, this.serverDirs, addMethod, serverDir);
+                AddXamlControlToControl<Grid>(xamlInfo, this.serverDirs, AddMethod, serverDir);
             }
         }
 
@@ -349,7 +349,7 @@ namespace MultiFolderClientV3
             }
         }
 
-        private void addMethod(string name)
+        private void AddMethod(string name)
         {
             // var name = ((Button)(sender)).CommandParameter.ToString();
             var path = System.IO.Path.Combine(ShowFolderBrowserDialog(), name);
@@ -380,7 +380,7 @@ namespace MultiFolderClientV3
                 ShowDirsBlock();
         }
 
-        private void deleteMethod(string path)
+        private void DeleteMethod(string path)
         {
             // var path = ((Button)(sender)).CommandParameter.ToString();
             bool isWork = false;
