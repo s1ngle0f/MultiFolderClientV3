@@ -37,6 +37,16 @@ namespace MultiFolderClientV3
             // AddLocalDirs(localDirs);
         }
 
+        private void WindowLoaded(object sender, RoutedEventArgs e)
+        {
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+
+            // Устанавливаем позицию окна внизу справа
+            this.Left = screenWidth - this.Width - 25;
+            this.Top = screenHeight - this.Height - 60;
+        }
+
         Synchronizer _app;
         private string _settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
         private void MyInit()
