@@ -115,6 +115,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Core\Updater.cs" />
     <Compile Include="UnitTest\AppTest.cs" />
     <Compile Include="UnitTest\DirectoryRepoTest.cs" />
     <Compile Include="UnitTest\PrimitiveTest.cs" />

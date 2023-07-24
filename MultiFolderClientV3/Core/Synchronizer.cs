@@ -12,7 +12,7 @@ namespace MultiFolderClientV3
 {
     public class Synchronizer
     {
-        private string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
+        public static string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
         private string login;
         private string userToken;
         public List<DirectoryRepo> directories = new List<DirectoryRepo>();
@@ -192,6 +192,7 @@ namespace MultiFolderClientV3
                 {
                     Dictionary<string, object> data = new Dictionary<string, object>
                     {
+                        { "version", "" },
                         { "login", "" },
                         { "userToken", "" },
                         { "directories", new List<string>() },
@@ -216,6 +217,7 @@ namespace MultiFolderClientV3
                     {
                         Dictionary<string, object> data = new Dictionary<string, object>
                         {
+                            { "version", "" },
                             { "login", "" },
                             { "userToken", "" },
                             { "directories", new List<string>() },

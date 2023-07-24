@@ -12,6 +12,60 @@ namespace MultiFolderClientV3
 {
     public static class HelpFunctions
     {
+        public static void TransferFieldsFromOldJsonToNewJson(string lastSettingsPath, string newSettingsPath, List<string> keysFilter = null, bool reverseKeysFilter = false)
+            //KeysFilter(без реверса) отвечает за то, какие значения ключей попадут из старого файла в новый
+        {
+            string newJsonData;
+            using (StreamReader lastStreamReader = File.OpenText(lastSettingsPath))
+            using (StreamReader newStreamReader = File.OpenText(newSettingsPath))
+            {
+                Dictionary<string, object> lastData = JsonConvert.DeserializeObject<Dictionary<string, object>>(lastStreamReader.ReadToEnd());
+                Dictionary<string, object> newData = JsonConvert.DeserializeObject<Dictionary<string, object>>(newStreamReader.ReadToEnd());
+                if (reverseKeysFilter && keysFilter != null)
+                    keysFilter = lastData.Keys.ToList().Except(keysFilter).ToList();
+                foreach (var lastDataKey in lastData.Keys)
+                {
+                    // Console.WriteLine($"\"{lastDataKey}\": {lastData[lastDataKey]}");
+                    if (newData.ContainsKey(lastDataKey))
+                    {
+                        if (keysFilter != null && !keysFilter.Contains(lastDataKey))
+                            continue;
+                        // Console.WriteLine($"    {lastDataKey}: {lastData[lastDataKey]} -> {newData[lastDataKey]}");
+                        newData[lastDataKey] = lastData[lastDataKey];
+                    }
+                }
+                newJsonData = JsonConvert.SerializeObject(newData, Formatting.Indented);
+            }
+            File.WriteAllText(newSettingsPath, newJsonData);
+        }
+
+        public static void CombineJsonFilesWithPreservation(string lastSettingsPath, string newSettings, List<string> keysFilter = null, bool reverseKeysFilter = false)
+            //KeysFilter(без реверса) отвечает за то, какие значения ключей попадут из старого файла в новый
+        {
+            string newJsonData;
+            using (StreamReader lastStreamReader = File.OpenText(lastSettingsPath))
+            {
+                Dictionary<string, object> lastData = JsonConvert.DeserializeObject<Dictionary<string, object>>(lastStreamReader.ReadToEnd());
+                Dictionary<string, object> newData = JsonConvert.DeserializeObject<Dictionary<string, object>>(newSettings);
+                if (reverseKeysFilter && keysFilter != null)
+                    keysFilter = lastData.Keys.ToList().Except(keysFilter).ToList();
+                foreach (var lastDataKey in lastData.Keys)
+                {
+                    // Console.WriteLine($"\"{lastDataKey}\": {lastData[lastDataKey]}");
+                    if (newData.ContainsKey(lastDataKey))
+                    {
+                        if (keysFilter != null && !keysFilter.Contains(lastDataKey))
+                            continue;
+                        // Console.WriteLine($"    {lastDataKey}: {lastData[lastDataKey]} -> {newData[lastDataKey]}");
+                        newData[lastDataKey] = lastData[lastDataKey];
+                        // newJsonData = JsonConvert.SerializeObject(newData, Formatting.Indented);
+                    }
+                }
+                newJsonData = JsonConvert.SerializeObject(newData, Formatting.Indented);
+            }
+            File.WriteAllText(lastSettingsPath, newJsonData);
+        }
+
         public static string HashPassword(string password)
         {
             using (SHA256 sha256Hash = SHA256.Create())
