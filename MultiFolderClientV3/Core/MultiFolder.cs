@@ -116,6 +116,22 @@ namespace MultiFolderClientV3
             client.DownloadString($"{basic_url}registrate?login={login}&password={password}");
         }
 
+        public string GetVersionFromServer()
+        {
+            WebClient client = new WebClient();
+            client.Encoding = System.Text.Encoding.GetEncoding("UTF-8");
+            var response = client.DownloadString($"{basic_url}get_version");
+            return response.Replace("\"", "");
+        }
+
+        public string GetSettingsJson()
+        {
+            WebClient client = new WebClient();
+            client.Encoding = System.Text.Encoding.GetEncoding("UTF-8");
+            var response = client.DownloadString($"{basic_url}get_settings_json");
+            return response;
+        }
+
         public List<string> GetListWorkingFiles()
         {
             WebClient client = new WebClient();
