@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Reflection;
 using Newtonsoft.Json.Linq;
 
 
@@ -13,11 +14,16 @@ namespace MultiFolderClientV3
     public class Synchronizer
     {
         public static string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
+        public static string settingsDirPath = Path.GetDirectoryName(settingsPath);
         private string login;
         private string userToken;
         public List<DirectoryRepo> directories = new List<DirectoryRepo>();
         private bool isWork = true;
         public MultiFolder multifolder;
+
+        public static string Version { get; private set; } = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+        public static string ExeName { get; private set; } = AppDomain.CurrentDomain.FriendlyName;
+        public static string ExePath { get; private set; } = Assembly.GetEntryAssembly().Location;
 
         public Synchronizer()
         {

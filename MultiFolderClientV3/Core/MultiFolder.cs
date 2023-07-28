@@ -132,12 +132,15 @@ namespace MultiFolderClientV3
             return response;
         }
 
-        public List<string> GetListWorkingFiles()
+        public dynamic GetListWorkingFiles(bool WithHash = false)
         {
             WebClient client = new WebClient();
             client.Encoding = System.Text.Encoding.GetEncoding("UTF-8");
             var response = client.DownloadString($"{basic_url}get_list_working_files");
-            return JToken.Parse(response)["files"].ToObject<List<string>>();
+            if (!WithHash)
+                return JToken.Parse(response)["files"].ToObject<List<string>>();
+            else
+                return JToken.Parse(response)["files_hash"].ToObject<Dictionary<string, string>>();
         }
 
         public void GetWorkingFile(string file_name, string file_path)

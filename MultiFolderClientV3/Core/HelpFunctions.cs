@@ -12,6 +12,65 @@ namespace MultiFolderClientV3
 {
     public static class HelpFunctions
     {
+        public static string Cmd(string command, bool IsPowerShell = false)
+        {
+            var fileName = IsPowerShell ? "powershell.exe" : "cmd.exe";
+            var arguments = IsPowerShell ? $"-Command {command}" : $"/c {command}";
+            // Настройка процесса
+            ProcessStartInfo psi = new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = arguments,
+                RedirectStandardOutput = true, // Перенаправляем вывод командной строки
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true, // Не создавать окно командной строки
+                StandardOutputEncoding = Encoding.UTF8
+            };
+
+            // Запуск процесса
+            Process process = new Process
+            {
+                StartInfo = psi
+            };
+            process.Start();
+
+            // Получение вывода командной строки
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+
+            // Дождитесь завершения процесса
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                throw new Exception($"ssh-keygen process failed with code {process.ExitCode}. Error output: {error}");
+            }
+
+            return output;
+        }
+
+        public static string HashFile(string filePath, string hashAlgorithm = "SHA256")
+        {
+            string BytesToHexString(byte[] bytes)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in bytes)
+                {
+                    sb.Append(b.ToString("x2"));
+                }
+                return sb.ToString();
+            }
+            using (var hashAlgorithmProvider = HashAlgorithm.Create(hashAlgorithm))
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] hashBytes = hashAlgorithmProvider.ComputeHash(fileStream);
+                    return BytesToHexString(hashBytes);
+                }
+            }
+        }
+
         public static void TransferFieldsFromOldJsonToNewJson(string lastSettingsPath, string newSettingsPath, List<string> keysFilter = null, bool reverseKeysFilter = false)
             //KeysFilter(без реверса) отвечает за то, какие значения ключей попадут из старого файла в новый
         {
@@ -123,6 +182,7 @@ namespace MultiFolderClientV3
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.RedirectStandardOutput = true;
                     process.StartInfo.RedirectStandardError = true;
+                    process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                     process.Start();
 
                     string output = process.StandardOutput.ReadToEnd();
@@ -172,6 +232,87 @@ namespace MultiFolderClientV3
             }
 
             return totalSize;
+        }
+
+        public static List<string> GetAllFilesDirectory(string targetDirectory, bool isRelativePath = true, List<string> files = null, string basePath = null)
+        {
+            if (Directory.Exists(targetDirectory))
+            {
+                if (files == null)
+                {
+                    files = new List<string>();
+                    basePath = targetDirectory;
+                }
+
+                string[] fileEntries = Directory.GetFiles(targetDirectory);
+
+                foreach (string fileName in fileEntries)
+                {
+                    string _fileName;
+                    if (isRelativePath)
+                        _fileName = GetRelativePath(basePath, fileName);
+                    else
+                        _fileName = fileName;
+                    _fileName = _fileName.Replace("\\", "/").Replace("//", "/");
+                    files.Add(_fileName);
+                }
+
+                string[] subdirectories = Directory.GetDirectories(targetDirectory);
+
+                foreach (string subdirectory in subdirectories)
+                {
+                    GetAllFilesDirectory(subdirectory, isRelativePath, files, basePath);
+                }
+
+                return files;
+            }
+
+            return null;
+        }
+
+        public static string GetRelativePath(string basePath, string targetPath)
+        {
+            if (string.IsNullOrEmpty(basePath) || string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException("Both basePath and targetPath must be provided.");
+
+            // Нормализация путей, замена слэшей на нужные разделители
+            basePath = Path.GetFullPath(basePath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            targetPath = Path.GetFullPath(targetPath).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            // Разбиваем пути на отдельные части для анализа
+            string[] baseDirectories = basePath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string[] targetDirectories = targetPath.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            // Находим индекс первого различающегося элемента
+            int commonIndex = 0;
+            while (commonIndex < baseDirectories.Length && commonIndex < targetDirectories.Length
+                && baseDirectories[commonIndex].Equals(targetDirectories[commonIndex], StringComparison.OrdinalIgnoreCase))
+            {
+                commonIndex++;
+            }
+
+            // Создаем относительный путь
+            if (commonIndex == 0)
+                return targetPath; // Пути полностью разные, невозможно найти общую часть.
+
+            // Количество каталогов, которые нужно поднять, чтобы начать относительный путь
+            int upCount = baseDirectories.Length - commonIndex;
+
+            // Формируем массив из "../" для подъема на нужный уровень
+            string[] relativePathParts = new string[upCount];
+            for (int i = 0; i < upCount; i++)
+                relativePathParts[i] = "..";
+
+            // Добавляем к ним оставшуюся часть пути от targetPath
+            string[] remainingParts = new string[targetDirectories.Length - commonIndex];
+            Array.Copy(targetDirectories, commonIndex, remainingParts, 0, remainingParts.Length);
+
+            // Объединяем все части в один путь с учетом разделителя
+            string relativePath = Path.Combine(relativePathParts);
+            if (remainingParts.Length > 0)
+                relativePath = Path.Combine(relativePath, Path.Combine(remainingParts));
+
+            return relativePath;
         }
 
         public static Dictionary<string, List<string>> CompareLists(List<string> first, List<string> second)
