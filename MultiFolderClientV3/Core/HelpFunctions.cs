@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Security.Cryptography;
 using System.Diagnostics;
+using System.Reflection;
 using Newtonsoft.Json;
 
 namespace MultiFolderClientV3
@@ -44,7 +45,7 @@ namespace MultiFolderClientV3
 
             if (process.ExitCode != 0)
             {
-                throw new Exception($"ssh-keygen process failed with code {process.ExitCode}. Error output: {error}");
+                throw new Exception($"Process failed with code {process.ExitCode}. Error output: {error}");
             }
 
             return output;
@@ -68,6 +69,51 @@ namespace MultiFolderClientV3
                     byte[] hashBytes = hashAlgorithmProvider.ComputeHash(fileStream);
                     return BytesToHexString(hashBytes);
                 }
+            }
+        }
+
+        public static string ConvertToUtf8(string input)
+        {
+            // Кодировка, используемая для чтения исходных данных (возможно, она будет другой, если ваш процесс возвращает данные в другой кодировке)
+            Encoding sourceEncoding = Encoding.Default;
+
+            // Кодировка, в которую хотим преобразовать данные (UTF-8)
+            Encoding targetEncoding = Encoding.UTF8;
+
+            // Преобразуем строку в массив байтов в исходной кодировке
+            byte[] sourceBytes = sourceEncoding.GetBytes(input);
+
+            // Преобразуем массив байтов в строку в формате UTF-8
+            string utf8String = targetEncoding.GetString(sourceBytes);
+
+            return utf8String;
+        }
+
+        public static string GetExePath(string pathForTests = null)
+        {
+            if (pathForTests == null)
+            {
+                try
+                {
+                    if (Assembly.GetEntryAssembly() != null)
+                        return Assembly.GetEntryAssembly()?.Location;
+
+                    // Получаем путь к исполняемому файлу текущего процесса.
+                    // string exePath = Process.GetCurrentProcess().MainModule.FileName;
+                    string exePath = Process.GetCurrentProcess().MainModule.FileName;
+                    return exePath;
+                }
+                catch (Exception ex)
+                {
+                    // Обработка исключения, если не удалось получить путь к исполняемому файлу.
+                    // Здесь можно предоставить путь по умолчанию или выполнить другие действия в случае ошибки.
+                    Console.WriteLine($"Ошибка при получении пути к исполняемому файлу: {ex.Message}");
+                    return null;
+                }
+            }
+            else
+            {
+                return pathForTests;
             }
         }
 

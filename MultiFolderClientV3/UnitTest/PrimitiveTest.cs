@@ -132,7 +132,7 @@ namespace MultiFolderClientV3.UnitTest
 
         public static void ResetSettings()
         {
-            string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
+            string settingsPath = Synchronizer.settingsPath;
 
             if (!File.Exists(settingsPath))
             {
@@ -178,7 +178,7 @@ namespace MultiFolderClientV3.UnitTest
 
         public static void SetNewLoginPassword()
         {
-            string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
+            string settingsPath = Synchronizer.settingsPath;
 
             string login = "user_test", password = "password_test";
 

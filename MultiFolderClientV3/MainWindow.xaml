@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Width="800"
     Height="350"
+    Closed="Window_Closed"
     Loaded="WindowLoaded"
     ResizeMode="NoResize"
     WindowStyle="None"

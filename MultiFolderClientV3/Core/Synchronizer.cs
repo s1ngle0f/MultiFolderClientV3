@@ -13,7 +13,12 @@ namespace MultiFolderClientV3
 {
     public class Synchronizer
     {
-        public static string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
+        public static string Version { get; private set; } = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+        public static string ExeName { get; private set; } = AppDomain.CurrentDomain.FriendlyName;
+        public static string ExePath { get; private set; } = HelpFunctions.GetExePath();
+        // public static string ExePath { get; private set; } = HelpFunctions.GetExePath(@"C:\Users\zubko\source\repos\MultiFolderClientV3\MultiFolderClientV3\bin\Debug\MultiFolderClientV3.exe"); //Для тестов
+        // public static string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json"; //Для итоговой версии
+        public static string settingsPath = Path.Combine(Path.GetDirectoryName(ExePath), "settings.json"); //Для работы напрямую, где компилируется проект
         public static string settingsDirPath = Path.GetDirectoryName(settingsPath);
         private string login;
         private string userToken;
@@ -21,12 +26,15 @@ namespace MultiFolderClientV3
         private bool isWork = true;
         public MultiFolder multifolder;
 
-        public static string Version { get; private set; } = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-        public static string ExeName { get; private set; } = AppDomain.CurrentDomain.FriendlyName;
-        public static string ExePath { get; private set; } = Assembly.GetEntryAssembly().Location;
-
-        public Synchronizer()
+        public Synchronizer(bool isTest = false)
         {
+            if (isTest)
+            {
+                ExePath = HelpFunctions.GetExePath(
+                    @"C:\Users\zubko\source\repos\MultiFolderClientV3\MultiFolderClientV3\bin\Debug\MultiFolderClientV3.exe");
+                settingsPath = Path.Combine(Path.GetDirectoryName(ExePath), "settings.json");
+                settingsDirPath = Path.GetDirectoryName(settingsPath);
+            }
             // СДЕЛАТЬ ПРОВЕРКУ НА ГИТ И ПРИ ЕГО ОСТУТСТВИИ УСТАНОВИТЬ!
             try
             {

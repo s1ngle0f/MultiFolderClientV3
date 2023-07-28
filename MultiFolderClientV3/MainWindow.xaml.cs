@@ -20,6 +20,8 @@ using System.Windows.Shapes;
 using System.Windows.Media.Animation;
 using System.Threading;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using MultiFolderClientV3.Core;
+using Path = System.IO.Path;
 
 namespace MultiFolderClientV3
 {
@@ -31,6 +33,7 @@ namespace MultiFolderClientV3
         public MainWindow()
         {
             InitializeComponent();
+
             DeleteDirsBlock();
             MyInit();
             InitNotifyIcon();
@@ -38,6 +41,8 @@ namespace MultiFolderClientV3
             //Тесты
             // var localDirs = GetLocalDirs();
             // AddLocalDirs(localDirs);
+            // Updater updater = new Updater(_app, 1);
+            // updater.Update();
         }
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
@@ -51,7 +56,6 @@ namespace MultiFolderClientV3
         }
 
         Synchronizer _app;
-        private string _settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
         private void MyInit()
         {
             _app = new Synchronizer();
@@ -86,7 +90,7 @@ namespace MultiFolderClientV3
 
         private void UpdateLoginPassword()
         {
-            using (StreamReader sr = File.OpenText(_settingsPath))
+            using (StreamReader sr = File.OpenText(Synchronizer.settingsPath))
             {
                 Dictionary<string, object> data = JsonConvert.DeserializeObject<Dictionary<string, object>>(sr.ReadToEnd());
                 var login = (string)data["login"];
@@ -98,7 +102,7 @@ namespace MultiFolderClientV3
 
         private void SetNewLoginPassword(string login, string password)
         {
-            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fileStream = new FileStream(Synchronizer.settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 using (var streamReader = new StreamReader(fileStream))
                 {
@@ -243,7 +247,7 @@ namespace MultiFolderClientV3
             //    localPaths.Add(dir.full_path);
             //}
             //return localPaths;
-            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fileStream = new FileStream(Synchronizer.settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 using (var streamReader = new StreamReader(fileStream))
                 {
@@ -367,7 +371,7 @@ namespace MultiFolderClientV3
             // var name = ((Button)(sender)).CommandParameter.ToString();
             var path = System.IO.Path.Combine(ShowFolderBrowserDialog(), name);
             bool isWork = false;
-            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fileStream = new FileStream(Synchronizer.settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 using (var streamReader = new StreamReader(fileStream))
                 {
@@ -398,7 +402,7 @@ namespace MultiFolderClientV3
             // var name = ((Button)(sender)).CommandParameter.ToString();
             var path = ShowFolderBrowserDialog();
             bool isWork = false;
-            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fileStream = new FileStream(Synchronizer.settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 using (var streamReader = new StreamReader(fileStream))
                 {
@@ -428,7 +432,7 @@ namespace MultiFolderClientV3
         {
             // var path = ((Button)(sender)).CommandParameter.ToString();
             bool isWork = false;
-            using (var fileStream = new FileStream(_settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            using (var fileStream = new FileStream(Synchronizer.settingsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite))
             {
                 using (var streamReader = new StreamReader(fileStream))
                 {
@@ -529,7 +533,7 @@ namespace MultiFolderClientV3
         private void InitNotifyIcon()
         {
             notifyIcon = new System.Windows.Forms.NotifyIcon();
-            string iconPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/dolphin.ico";
+            string iconPath = Path.Combine(Synchronizer.settingsDirPath, "dolphin.ico");
             notifyIcon.Icon = new System.Drawing.Icon(iconPath);
 
             // Create a context menu for the icon
@@ -572,5 +576,12 @@ namespace MultiFolderClientV3
         //         base.Dispose();
         // }
         #endregion
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Updater updater = new Updater(_app);
+            if(updater.IsReadyForUpdate())
+                updater.Update();
+        }
     }
 }

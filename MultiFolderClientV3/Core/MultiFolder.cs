@@ -147,6 +147,8 @@ namespace MultiFolderClientV3
         {
             WebClient client = new WebClient();
             client.Encoding = System.Text.Encoding.GetEncoding("UTF-8");
+            if (!Directory.Exists(Path.GetDirectoryName(file_path)))
+                Directory.CreateDirectory(Path.GetDirectoryName(file_path));
             client.DownloadFile($"{basic_url}get_working_file?file_name={file_name}", file_path);
         }
 

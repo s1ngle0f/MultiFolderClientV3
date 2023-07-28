@@ -22,6 +22,13 @@ namespace MultiFolderClientV3.Core
             _timeSleep = timeSleep;
         }
 
+        public Updater(Synchronizer synchronizer)
+        {
+            this.synchronizer = synchronizer;
+            _timeSleep = 600;
+        }
+
+        [Obsolete]
         public void Start()
         {
             Thread monitoring = new Thread(new ThreadStart(StartMonitoring));
@@ -39,20 +46,57 @@ namespace MultiFolderClientV3.Core
             }
         }
 
-        private void Update()
+        public bool IsReadyForUpdate()
+        {
+            var VersionFromServer = synchronizer.multifolder.GetVersionFromServer();
+            if (Synchronizer.Version != VersionFromServer)
+                return true;
+            return false;
+        }
+
+        public void Update(bool withReRun = false)
         {
             //Get-ChildItem -Path "C:\путь_к_папке"
             //Get-ChildItem -Filter "*123---321*" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace("123---321", "") }
             //del file.txt
+            ClearFromLastUpdateWithSuffix();
             Dictionary<string, string> serverFilesWithHash = synchronizer.multifolder.GetListWorkingFiles(WithHash: true);
             List<string> filesForUpdate = GetFilesByDifferentHash(serverFilesWithHash);
             List<string> filesForDelete = GetFilesForDelete(serverFilesWithHash, filesForUpdate);
             DownloadNewFiles(filesForUpdate);
             string commandForDelete = GetCommandDeleteOldFiles(filesForDelete);
-            HelpFunctions.Cmd($"taskkill /f /im \"{Synchronizer.ExeName}\" && timeout /t 7 && {commandForDelete} && " +
-                // "Get-ChildItem -Filter \"*" + SUFFIX + "*\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\"" + SUFFIX + "\", \"\") }");
-                "Get-ChildItem -Path \"" + Synchronizer.settingsDirPath + "\" -Filter \"*" + SUFFIX + "*\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\"" + SUFFIX + "\", \"\") } && " +
-                $"\"{Synchronizer.ExePath}\"", true);
+            string command = $"taskkill /f /im \"{Synchronizer.ExeName}\"; " +
+                             $"timeout /t 7; " +
+                             $"{commandForDelete}; " +
+                             ("Get-ChildItem -Path \"" + Synchronizer.settingsDirPath + "\" -Filter \"*" + SUFFIX + "*\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\"" + SUFFIX + "\", \"\") }").Replace("\"", "\\\"");
+            if (withReRun)
+                command += $"; \"{Synchronizer.ExePath}\"";
+            using (StreamWriter writer = new StreamWriter(Path.Combine(Synchronizer.settingsDirPath, "debug.txt")))
+            {
+                writer.Write(command);
+            }
+            HelpFunctions.Cmd(command, true);
+            // foreach (var VARIABLE in filesForUpdate)
+            // {
+            //     Console.WriteLine(VARIABLE);
+            // }
+            // Console.WriteLine("-----------------------------");
+            // foreach (var VARIABLE in filesForDelete)
+            // {
+            //     Console.WriteLine(VARIABLE);
+            // }
+            // Console.WriteLine("-----------------------------");
+            // Console.WriteLine(command);
+        }
+
+        private void ClearFromLastUpdateWithSuffix()
+        {
+            List<string> allFiles = HelpFunctions.GetAllFilesDirectory(Synchronizer.settingsDirPath, false);
+            foreach (var file in allFiles)
+            {
+                if(file.Contains(SUFFIX))
+                    File.Delete(file);
+            }
         }
 
         private void DownloadNewFiles(List<string> filesRelativePath)
@@ -82,7 +126,7 @@ namespace MultiFolderClientV3.Core
             foreach (string fileRelPath in filesRelativePath)
             {
                 if(fileRelPath != filesRelativePath.LastOrDefault())
-                    res += $"del \"{Path.Combine(Path.GetDirectoryName(Synchronizer.settingsPath), fileRelPath)}\" && ";
+                    res += $"del \"{Path.Combine(Path.GetDirectoryName(Synchronizer.settingsPath), fileRelPath)}\"; ";
                 else
                     res += $"del \"{Path.Combine(Path.GetDirectoryName(Synchronizer.settingsPath), fileRelPath)}\"";
             }
@@ -99,18 +143,26 @@ namespace MultiFolderClientV3.Core
 
         private List<string> GetFilesForDelete(Dictionary<string, string> serverFilesWithHash, List<string> filesByDiffHash)
         {
+            List<string> _filesByDiffHash = filesByDiffHash.ToArray().ToList();
             List<string> unusedFiles = HelpFunctions.CompareLists(serverFilesWithHash.Keys.ToList(), HelpFunctions.GetAllFilesDirectory(Path.GetDirectoryName(Synchronizer.settingsPath)))["add"];
             foreach (string unusedFile in unusedFiles)
             {
-                if(!filesByDiffHash.Contains(unusedFile))
+                if(!_filesByDiffHash.Contains(unusedFile))
                 {
-                    filesByDiffHash.Add(unusedFile);
+                    _filesByDiffHash.Add(unusedFile);
                 }
             }
-            if(filesByDiffHash.Contains("settings.json"))
-                filesByDiffHash.Remove("settings.json");
+            if(_filesByDiffHash.Contains("settings.json"))
+                _filesByDiffHash.Remove("settings.json");
 
-            return filesByDiffHash;
+            List<string> res = new List<string>();
+            foreach (var filePath in _filesByDiffHash)
+            {
+                if(File.Exists(Path.Combine(Synchronizer.settingsDirPath, filePath)))
+                    res.Add(filePath);
+            }
+
+            return res;
         }
 
         private List<string> GetFilesByDifferentHash(Dictionary<string, string> filesHash)

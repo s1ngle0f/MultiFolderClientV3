@@ -13,7 +13,7 @@ namespace MultiFolderClientV3.UnitTest
 {
     public class AppTest
     {
-        private static string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json";
+        private static string settingsPath = Synchronizer.settingsPath;
         //public static void Main(string[] args)
         //{
         //    //CheckGitVersion();
