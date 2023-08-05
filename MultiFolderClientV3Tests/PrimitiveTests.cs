@@ -21,7 +21,8 @@ namespace MultiFolderClientV3Tests
         [TestMethod]
         public void TestDeleteWithPowerShell()
         {
-            string command = "Get-ChildItem -Path \"C:\\Users\\zubko\\source\\repos\\MultiFolderClientV3\\MultiFolderClientV3\\bin\\Debug\" -Filter \"*y8FfZm_Temp*\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\"y8FfZm_Temp\", \"\") };";
+            // string command = "Get-ChildItem -Path \"C:\\Users\\zubko\\source\\repos\\MultiFolderClientV3\\MultiFolderClientV3\\bin\\Debug\" -Filter \"*y8FfZm_Temp*\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\"y8FfZm_Temp\", \"\") };";
+            string command = "del \"C:\\Users\\zubko\\source\\repos\\MultiFolderClientV3\\MultiFolderClientV3\\bin\\Debug\\dolphin — копия.ico\"";
             // string command = "Get-ChildItem -Path \\\"C:\\Users\\zubko\\source\\repos\\MultiFolderClientV3\\MultiFolderClientV3\\bin\\Debug\\\" -Filter \\\"*y8FfZm_Temp*\\\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\\\"y8FfZm_Temp\\\", \\\"\\\") };";
             Console.WriteLine(command);
             HelpFunctions.Cmd(command.Replace("\"", "\\\""), true);

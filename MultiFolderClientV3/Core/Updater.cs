@@ -35,6 +35,7 @@ namespace MultiFolderClientV3.Core
             monitoring.Start();
         }
 
+        [Obsolete("Не оптимально постоянно проверять версию")]
         private void StartMonitoring()
         {
             while (true)
@@ -63,18 +64,22 @@ namespace MultiFolderClientV3.Core
             Dictionary<string, string> serverFilesWithHash = synchronizer.multifolder.GetListWorkingFiles(WithHash: true);
             List<string> filesForUpdate = GetFilesByDifferentHash(serverFilesWithHash);
             List<string> filesForDelete = GetFilesForDelete(serverFilesWithHash, filesForUpdate);
+            if (filesForDelete.Contains("settings.json"))
+                filesForDelete.Remove("settings.json");
             DownloadNewFiles(filesForUpdate);
+            string newJson = synchronizer.multifolder.GetSettingsJson();
+            HelpFunctions.CombineJsonFilesWithPreservation(Synchronizer.settingsPath, newJson, new List<string>() {"version"}, true);
             string commandForDelete = GetCommandDeleteOldFiles(filesForDelete);
-            string command = $"taskkill /f /im \"{Synchronizer.ExeName}\"; " +
-                             $"timeout /t 7; " +
-                             $"{commandForDelete}; " +
-                             ("Get-ChildItem -Path \"" + Synchronizer.settingsDirPath + "\" -Filter \"*" + SUFFIX + "*\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\"" + SUFFIX + "\", \"\") }").Replace("\"", "\\\"");
+            string command = (filesForDelete.Contains(Synchronizer.ExeName) ? $"taskkill /f /im \"{Synchronizer.ExeName}\"; timeout /t 7; " : "") +
+                             $"{commandForDelete.Replace("\"", "\\\"")}; " +
+                             ("Get-ChildItem -Path \"" + Synchronizer.settingsDirPath + "\" -Filter \"*" + SUFFIX + "*\" -Recurse | ForEach-Object { Rename-Item $_.FullName $_.Name.Replace(\"" + SUFFIX + "\", \"\") }").
+                             Replace("\"", "\\\"");
             if (withReRun)
                 command += $"; \"{Synchronizer.ExePath}\"";
-            using (StreamWriter writer = new StreamWriter(Path.Combine(Synchronizer.settingsDirPath, "debug.txt")))
-            {
-                writer.Write(command);
-            }
+            // using (StreamWriter writer = new StreamWriter(Path.Combine(Synchronizer.settingsDirPath, "debug.txt")))
+            // {
+            //     writer.Write(command);
+            // }
             HelpFunctions.Cmd(command, true);
             // foreach (var VARIABLE in filesForUpdate)
             // {
@@ -152,8 +157,6 @@ namespace MultiFolderClientV3.Core
                     _filesByDiffHash.Add(unusedFile);
                 }
             }
-            if(_filesByDiffHash.Contains("settings.json"))
-                _filesByDiffHash.Remove("settings.json");
 
             List<string> res = new List<string>();
             foreach (var filePath in _filesByDiffHash)
@@ -177,6 +180,31 @@ namespace MultiFolderClientV3.Core
                     var localHash = HelpFunctions.HashFile(localPath);
                     var serverHash = filesHash[filesRelativePath];
                     if(localHash != serverHash)
+                        res.Add(filesRelativePath);
+                }
+                else
+                    res.Add(filesRelativePath);
+            }
+            return res;
+        }
+
+        /// <summary>
+        /// Получение файлов, которые отличаются от тех, которые хранятся на сервере
+        /// </summary>
+        /// <returns></returns>
+        private List<string> GetFilesByDifferentHash()
+        {
+            Dictionary<string, string> filesHash = synchronizer.multifolder.GetListWorkingFiles(WithHash: true);
+            List<string> res = new List<string>();
+            foreach (string filesRelativePath in filesHash.Keys)
+            {
+                var basePath = Path.GetDirectoryName(Synchronizer.settingsPath);
+                var localPath = Path.Combine(basePath, filesRelativePath);
+                if (File.Exists(localPath))
+                {
+                    var localHash = HelpFunctions.HashFile(localPath);
+                    var serverHash = filesHash[filesRelativePath];
+                    if (localHash != serverHash)
                         res.Add(filesRelativePath);
                 }
                 else

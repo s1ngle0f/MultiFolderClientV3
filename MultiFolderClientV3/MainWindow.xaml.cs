@@ -59,6 +59,8 @@ namespace MultiFolderClientV3
         private void MyInit()
         {
             _app = new Synchronizer();
+            Updater updater = new Updater(_app);
+            updater.Update();
             _app.Start();
             UpdateLoginPassword();
             if (_app.multifolder.IsExistUser())
@@ -579,9 +581,9 @@ namespace MultiFolderClientV3
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            Updater updater = new Updater(_app);
-            if(updater.IsReadyForUpdate())
-                updater.Update();
+            // Updater updater = new Updater(_app);
+            // if(updater.IsReadyForUpdate())
+            //     updater.Update();
         }
     }
 }

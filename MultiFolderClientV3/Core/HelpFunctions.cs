@@ -117,6 +117,13 @@ namespace MultiFolderClientV3
             }
         }
 
+        /// <summary>
+        /// KeysFilter(без реверса) отвечает за то, какие значения ключей попадут из старого файла в новый
+        /// </summary>
+        /// <param name="lastSettingsPath"></param>
+        /// <param name="newSettingsPath"></param>
+        /// <param name="keysFilter"></param>
+        /// <param name="reverseKeysFilter"></param>
         public static void TransferFieldsFromOldJsonToNewJson(string lastSettingsPath, string newSettingsPath, List<string> keysFilter = null, bool reverseKeysFilter = false)
             //KeysFilter(без реверса) отвечает за то, какие значения ключей попадут из старого файла в новый
         {
@@ -144,6 +151,13 @@ namespace MultiFolderClientV3
             File.WriteAllText(newSettingsPath, newJsonData);
         }
 
+        /// <summary>
+        /// KeysFilter(без реверса) отвечает за то, какие значения ключей попадут из старого файла в новый
+        /// </summary>
+        /// <param name="lastSettingsPath"></param>
+        /// <param name="newSettings"></param>
+        /// <param name="keysFilter"></param>
+        /// <param name="reverseKeysFilter"></param>
         public static void CombineJsonFilesWithPreservation(string lastSettingsPath, string newSettings, List<string> keysFilter = null, bool reverseKeysFilter = false)
             //KeysFilter(без реверса) отвечает за то, какие значения ключей попадут из старого файла в новый
         {
