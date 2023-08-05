@@ -13,6 +13,21 @@ namespace MultiFolderClientV3
 {
     public static class HelpFunctions
     {
+        public static void CreateShortcut(string shortcutPath, string targetPath, string description = null)
+        {
+            IWshRuntimeLibrary.WshShell shell = new IWshRuntimeLibrary.WshShell();
+            IWshRuntimeLibrary.IWshShortcut shortcut = (IWshRuntimeLibrary.IWshShortcut) shell.CreateShortcut(shortcutPath);
+
+            shortcut.TargetPath = targetPath;
+            shortcut.Description = description;
+            // Дополнительные настройки шортката, например:
+            // shortcut.WorkingDirectory = "путь_к_рабочему_каталогу";
+            // shortcut.IconLocation = "путь_к_иконке";
+            // shortcut.Arguments = "аргументы_к_целевому_приложению";
+
+            shortcut.Save();
+        }
+
         public static string Cmd(string command, bool IsPowerShell = false)
         {
             var fileName = IsPowerShell ? "powershell.exe" : "cmd.exe";

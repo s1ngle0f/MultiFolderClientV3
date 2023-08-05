@@ -16,6 +16,7 @@ namespace MultiFolderClientV3
         public static string Version { get; private set; } = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
         public static string ExeName { get; private set; } = AppDomain.CurrentDomain.FriendlyName;
         public static string ExePath { get; private set; } = HelpFunctions.GetExePath();
+        public static string StartupFolderPath { get; private set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Microsoft", "Windows", "Start Menu", "Programs", "Startup");
         // public static string ExePath { get; private set; } = HelpFunctions.GetExePath(@"C:\Users\zubko\source\repos\MultiFolderClientV3\MultiFolderClientV3\bin\Debug\MultiFolderClientV3.exe"); //Для тестов
         // public static string settingsPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/MultiFolder/settings.json"; //Для итоговой версии
         public static string settingsPath = Path.Combine(Path.GetDirectoryName(ExePath), "settings.json"); //Для работы напрямую, где компилируется проект
@@ -35,6 +36,11 @@ namespace MultiFolderClientV3
                 settingsPath = Path.Combine(Path.GetDirectoryName(ExePath), "settings.json");
                 settingsDirPath = Path.GetDirectoryName(settingsPath);
             }
+
+            var shortcutPath = Path.Combine(StartupFolderPath, "MultiFolderV3.lnk");
+            if (!File.Exists(shortcutPath))
+                HelpFunctions.CreateShortcut(shortcutPath, ExePath);
+
             // СДЕЛАТЬ ПРОВЕРКУ НА ГИТ И ПРИ ЕГО ОСТУТСТВИИ УСТАНОВИТЬ!
             try
             {

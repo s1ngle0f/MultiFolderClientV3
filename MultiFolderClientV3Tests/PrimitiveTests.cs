@@ -41,5 +41,11 @@ namespace MultiFolderClientV3Tests
             Console.WriteLine(AppDomain.CurrentDomain.FriendlyName);
             Console.WriteLine("------------------------");
         }
+
+        [TestMethod]
+        public void TestCreateShortcut()
+        {
+            HelpFunctions.CreateShortcut(@"C:\Users\zubko\source\repos\MultiFolderClientV3\MultiFolderClientV3\bin\Debug\MultiFolderClientV3.lnk", @"C:\Users\zubko\source\repos\MultiFolderClientV3\MultiFolderClientV3\bin\Debug\MultiFolderClientV3.exe");
+        }
     }
 }
