@@ -14,8 +14,10 @@ namespace MultiFolderClientV3
     public class MultiFolder
     {
         // private string basic_url = "http://localhost:5000/";
-        private static string ip_addr = "multifolder.ru";
-        private string basic_url = $"https://{ip_addr}/";
+        //private static string ip_addr = "multifolder.ru";
+        //private string basic_url = $"https://{ip_addr}/";
+        private static string ip_addr = "81.94.156.206:5000";
+        private string basic_url = $"http://{ip_addr}/";
 
         public string login;
         public string userToken;

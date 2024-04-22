@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="MultiFolderClientV3.DirectoryRepo">
+    <Position X="8" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgSIAAAAAAIECAAAAAAEAAAAAoAAAAAAIIAA=</HashCode>
+      <FileName>Core\DirectoryRepo.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="multifolder" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="MultiFolderClientV3.HelpFunctions">
+    <Position X="15.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAQAAAAABAAEEACACAAAAAQAUIAAAAAAMAYAAAAAABA=</HashCode>
+      <FileName>Core\HelpFunctions.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MultiFolderClientV3.MultiFolder">
+    <Position X="5.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACIIRAAAAEAAAIgIkAUAACAABAAAAAQEAAUAAgAEEA=</HashCode>
+      <FileName>Core\MultiFolder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="MultiFolderClientV3.Synchronizer">
+    <Position X="13" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAKQEIAAACAAARIAAAAAAAAEAQIIAAgCoAAQMAACEAA=</HashCode>
+      <FileName>Core\Synchronizer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="multifolder" />
+    </ShowAsAssociation>
+    <ShowAsCollectionAssociation>
+      <Field Name="directories" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="MultiFolderClientV3.Core.Updater">
+    <Position X="10.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IASIAAAAACAAAQAQMQAAEJAAAAAgAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Core\Updater.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="synchronizer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="System.Object" Collapsed="true">
+    <Position X="13" Y="0.75" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
