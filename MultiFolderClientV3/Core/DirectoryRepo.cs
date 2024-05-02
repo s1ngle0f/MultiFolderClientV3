@@ -146,7 +146,7 @@ namespace MultiFolderClientV3
                 powershell.AddScript(@"git add -A");
                 powershell.AddScript(@"git commit -am 'Work'");
                 powershell.AddScript(@"git push origin master");
-                Console.WriteLine("Checked");
+                Console.WriteLine($"Checked {full_path}");
 
                 Collection<PSObject> results = powershell.Invoke();
             }
