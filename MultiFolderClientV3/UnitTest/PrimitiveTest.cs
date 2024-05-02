@@ -15,13 +15,13 @@ namespace MultiFolderClientV3.UnitTest
 {
     public class PrimitiveTest
     {
-        static MultiFolder multiFolder = new MultiFolder("user1", "user1");
+        static MultiFolder multiFolder = new MultiFolder("test", "test");
 
         //public static void Main(string[] args)
         //{
         //    //GenerateSshRemote();
         //    //Ping();
-        //    //IsExistUser();
+        //    IsExistUser();
         //    //GetDirs();
         //    //AddDir();
         //    //DeleteDir();
@@ -32,7 +32,7 @@ namespace MultiFolderClientV3.UnitTest
         //    //GetRsaKey();
         //    //GetSessionUser();
         //    //ResetSettings();
-        //    HashPassword("123");
+        //    HashPassword("test");
         //    Console.ReadLine();
         //}
 
@@ -50,7 +50,7 @@ namespace MultiFolderClientV3.UnitTest
 
         public static void IsExistUser()
         {
-            var response = multiFolder.IsExistUser("user1", "user1");
+            var response = multiFolder.IsExistUser("test", "test");
             Console.WriteLine($"{response} {response.GetType()}");
         }
 

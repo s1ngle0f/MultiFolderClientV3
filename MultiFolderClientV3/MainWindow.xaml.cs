@@ -59,8 +59,8 @@ namespace MultiFolderClientV3
         private void MyInit()
         {
             _app = new Synchronizer();
-            Updater updater = new Updater(_app);
-            updater.Update();
+            //Updater updater = new Updater(_app);
+            //updater.Update();
             _app.Start();
             UpdateLoginPassword();
             if (_app.multifolder.IsExistUser())
@@ -411,7 +411,7 @@ namespace MultiFolderClientV3
                     string json = streamReader.ReadToEnd();
                     dynamic data = JsonConvert.DeserializeObject(json);
 
-                    if (!Directory.Exists(path) && !DirsContainsPath(path, data.directories))
+                    if (Directory.Exists(path) && !DirsContainsPath(path, data.directories))
                     {
                         data.directories.Add(path);
                         json = JsonConvert.SerializeObject(data, Formatting.Indented);
